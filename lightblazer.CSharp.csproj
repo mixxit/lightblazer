@@ -74,6 +74,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\AI.cs" />
+    <Compile Include="Assets\AIManager.cs" />
     <Compile Include="Assets\ControlManager.cs" />
     <Compile Include="Assets\TileManager.cs" />
   </ItemGroup>

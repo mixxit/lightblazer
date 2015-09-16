@@ -29,7 +29,7 @@ public class TileManager : MonoBehaviour {
             for (int x = 0 - (maxrenderx / 2); x < (maxrenderx / 2); x++)
             {
                 //Instantiate tile prefab at the desired position as a Transform object
-                Transform tile = Instantiate(tilePrefab, new Vector3(x, y, 0), Quaternion.identity) as Transform;
+                Transform tile = Instantiate(tilePrefab, new Vector2(x, y), Quaternion.identity) as Transform;
                 //Set the tiles parent to the GameObject this script is attached to
                 tile.parent = transform;
             }

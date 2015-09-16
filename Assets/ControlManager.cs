@@ -6,13 +6,15 @@ public class ControlManager : MonoBehaviour {
     const int orthographicSizeMin = 10;
     const int orthographicSizeMax = 20;
 
-    private Vector3 startDragPos;
-    private Vector3 endDragPos;
-    private GameObject selectionbox;
+    private Vector2 startDragPos;
+    private Vector2 endDragPos;
+    private Transform selectionbox;
+    private Transform selectionbox_prefab;
 
     // Use this for initialization
     void Start() {
         Camera.main.orthographicSize = 10;
+        selectionbox_prefab = Resources.Load<Transform>("Sprites/selectionbox");
     }
 
     // Update is called once per frame
@@ -25,15 +27,15 @@ public class ControlManager : MonoBehaviour {
     {
         if (selectionbox != null)
         {
-            Vector3 newpos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 newpos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             float x = newpos.x - startDragPos.x;
             float y = newpos.y - startDragPos.y;
 
             float midpointx = startDragPos.x + (x/2);
             float midpointy = startDragPos.y + (y/2);
 
-            selectionbox.transform.position = new Vector3(midpointx, midpointy, 0);
-            selectionbox.transform.localScale = new Vector3(x, y, 0.1f);
+            selectionbox.transform.position = new Vector2(midpointx, midpointy);
+            selectionbox.transform.localScale = new Vector2(x, y);
         }
 
         if (Input.GetMouseButtonDown(0))
@@ -42,25 +44,20 @@ public class ControlManager : MonoBehaviour {
             if (selectionbox == null)
             {
                 startDragPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                selectionbox = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                selectionbox.transform.position = new Vector3(startDragPos.x, startDragPos.y, 0);  ;
-                selectionbox.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-                Color colour = Color.blue;
-                colour.a = 0.35f;
-                selectionbox.GetComponent<Renderer>().material.color = colour;
-                selectionbox.GetComponent<Renderer>().material.shader = Shader.Find("Transparent/Diffuse");
+                selectionbox = Instantiate(selectionbox_prefab, new Vector2(0, 0), Quaternion.identity) as Transform;
             }
         }
 
         if (Input.GetMouseButtonUp(0))
         {
             endDragPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Destroy(selectionbox);
+            Destroy(selectionbox.gameObject);
+
         }
 
 
     }
-
+    
     void handleScrollUpdate()
     {
         if (Input.GetAxis("Mouse ScrollWheel") < 0) // forward
