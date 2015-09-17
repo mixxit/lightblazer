@@ -36,6 +36,7 @@ public class ControlManager : MonoBehaviour {
 
             selectionbox.transform.position = new Vector2(midpointx, midpointy);
             selectionbox.transform.localScale = new Vector2(x, y);
+            selectionbox.GetComponent<SpriteRenderer>().bounds.size.x = x;
         }
 
         if (Input.GetMouseButtonDown(0))
