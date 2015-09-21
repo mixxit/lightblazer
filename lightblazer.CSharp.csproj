@@ -71,6 +71,7 @@
     <Compile Include="Assets\AI.cs" />
     <Compile Include="Assets\AIManager.cs" />
     <Compile Include="Assets\ControlManager.cs" />
+    <Compile Include="Assets\SelectionArea.cs" />
     <Compile Include="Assets\TileManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />

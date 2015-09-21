@@ -6,57 +6,82 @@ public class ControlManager : MonoBehaviour {
     const int orthographicSizeMin = 10;
     const int orthographicSizeMax = 20;
 
-    private Vector2 startDragPos;
-    private Vector2 endDragPos;
-    private Transform selectionbox;
-    private Transform selectionbox_prefab;
+    private Vector2 dragStartPos = Vector2.zero;
+    private Vector2 dragEndPosition = Vector2.zero;
+    public Texture tex;
 
     // Use this for initialization
     void Start() {
         Camera.main.orthographicSize = 10;
-        selectionbox_prefab = Resources.Load<Transform>("Sprites/selectionbox");
     }
 
     // Update is called once per frame
     void Update() {
         handleScrollUpdate();
+        handleSelectSecondary();
         handleDragSelect();
+    }
+
+    void OnGUI()
+    {
+        drawSelectionBox();
+    }
+
+    void handleSelectSecondary()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            Vector2 rayCastLocation = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            RaycastHit2D hit = Physics2D.Raycast(rayCastLocation, -Vector2.up);
+            if (hit.collider != null)
+            {
+                GameObject[] mobs = GameObject.FindGameObjectsWithTag("Mob");
+                foreach (GameObject mob in mobs)
+                {
+                    mob.SendMessage("HandleInteract", hit.collider.gameObject);
+                }
+            }
+        }
     }
 
     void handleDragSelect()
     {
-        if (selectionbox != null)
-        {
-            Vector2 newpos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            float x = newpos.x - startDragPos.x;
-            float y = newpos.y - startDragPos.y;
-
-            float midpointx = startDragPos.x + (x/2);
-            float midpointy = startDragPos.y + (y/2);
-
-            selectionbox.transform.position = new Vector2(midpointx, midpointy);
-            selectionbox.transform.localScale = new Vector2(x, y);
-            selectionbox.GetComponent<SpriteRenderer>().bounds.size.x = x;
-        }
-
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.LogWarning("Mouse is down");
-            if (selectionbox == null)
-            {
-                startDragPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                selectionbox = Instantiate(selectionbox_prefab, new Vector2(0, 0), Quaternion.identity) as Transform;
-            }
+            dragStartPos = Input.mousePosition;
+        } 
+
+        if (Input.GetMouseButton(0))
+        {
+            dragEndPosition = Input.mousePosition;
         }
 
         if (Input.GetMouseButtonUp(0))
         {
-            endDragPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Destroy(selectionbox.gameObject);
+            GameObject[] mobs = GameObject.FindGameObjectsWithTag("Mob");
+            SelectionArea area = new SelectionArea();
+            area.startvector = Vector2.Min(Camera.main.ScreenToWorldPoint(dragStartPos), Camera.main.ScreenToWorldPoint(dragEndPosition));
+            area.endvector = Vector2.Max(Camera.main.ScreenToWorldPoint(dragStartPos), Camera.main.ScreenToWorldPoint(dragEndPosition)); ;
 
+            foreach (GameObject mob in mobs)
+            {
+                mob.SendMessage("HandleSelection", area);
+            }
+
+            dragStartPos = Vector2.zero;
+            dragEndPosition = Vector2.zero;
         }
 
 
+    }
+
+    void drawSelectionBox()
+    {
+        if (dragStartPos != Vector2.zero && dragEndPosition != Vector2.zero)
+        {
+            Rect tmp = new Rect(dragStartPos.x, Screen.height - dragStartPos.y, dragEndPosition.x - dragStartPos.x, -1 * ((Screen.height - dragStartPos.y) - (Screen.height - dragEndPosition.y)));
+            GUI.DrawTextureWithTexCoords(tmp, tex, new Rect(dragStartPos.x, Screen.height - dragStartPos.y, dragEndPosition.x - dragStartPos.x, -1 * ((Screen.height - dragStartPos.y) - (Screen.height - dragEndPosition.y))));
+        }
     }
     
     void handleScrollUpdate()
