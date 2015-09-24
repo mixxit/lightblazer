@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public class AI : MonoBehaviour {
     internal float x;
@@ -8,6 +9,8 @@ public class AI : MonoBehaviour {
 
     float movingtox;
     float movingtoy;
+
+    List<Transform> pathinglines = new List<Transform>();
 
     // Use this for initialization
     void Start () {
@@ -90,7 +93,7 @@ public class AI : MonoBehaviour {
                 if (distance < Vector3.Distance(choice, destination))
                 {
 
-                    Vector2 rayCastLocation = new Vector2(x,y);
+                    /*Vector2 rayCastLocation = new Vector2(x,y);
                     RaycastHit2D hit = Physics2D.Raycast(rayCastLocation, -Vector2.up);
                     if (hit.collider != null)
                     {
@@ -98,9 +101,8 @@ public class AI : MonoBehaviour {
                         {
                             choice = cur;
                         }
-                    }
-
-                    
+                    }*/
+                    choice = cur;
                 }
 
             }
@@ -108,8 +110,29 @@ public class AI : MonoBehaviour {
         return choice;
     }
 
+    public List<Vector2> FetchStepsToDestination(Vector2 origin, Vector2 destination)
+    {
+        List<Vector2> locationsteps = new List<Vector2>();
+        Vector2 currentlocation = origin;
+
+        while (currentlocation != destination)
+        {
+            currentlocation = FindAdjacentTileClosestToDestination(currentlocation, destination);
+            locationsteps.Add(currentlocation);
+        }
+
+        return locationsteps;
+    }
+
     public void Move()
     {
+        foreach(Transform pathingline in pathinglines)
+        {
+            Destroy(pathingline.gameObject);
+        }
+
+        pathinglines.Clear();
+
         if (x != movingtox || y != movingtoy)
         {
             Debug.LogWarning("Trying to determine best way to get to " + movingtox + "," + movingtoy);
@@ -119,6 +142,14 @@ public class AI : MonoBehaviour {
             Debug.Log("Moving to " + moveto.x + "," + moveto.y);
             x = moveto.x;
             y = moveto.y;
+
+            List<Vector2> stepstodestination = FetchStepsToDestination(new Vector2(x, y), new Vector2(movingtox, movingtoy));
+            foreach(Vector2 step in stepstodestination)
+            {
+                Transform PathingLinePrefab = Resources.Load<Transform>("Tiles/PathingLine");
+                Transform pathingline = Instantiate(PathingLinePrefab, new Vector2(step.x, step.y), Quaternion.identity) as Transform;
+                pathinglines.Add(pathingline);
+            }
         }
 
         if (x != transform.position.x || y != transform.position.y)
