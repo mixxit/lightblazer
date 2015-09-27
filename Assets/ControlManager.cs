@@ -9,6 +9,7 @@ public class ControlManager : MonoBehaviour {
     private Vector2 dragStartPos = Vector2.zero;
     private Vector2 dragEndPosition = Vector2.zero;
     public Texture tex;
+    
 
     // Use this for initialization
     void Start() {
@@ -20,6 +21,7 @@ public class ControlManager : MonoBehaviour {
         handleScrollUpdate();
         handleSelectSecondary();
         handleDragSelect();
+        handleKeys();
     }
 
     void OnGUI()
@@ -35,11 +37,8 @@ public class ControlManager : MonoBehaviour {
             RaycastHit2D hit = Physics2D.Raycast(rayCastLocation, -Vector2.up);
             if (hit.collider != null)
             {
-                GameObject[] mobs = GameObject.FindGameObjectsWithTag("Mob");
-                foreach (GameObject mob in mobs)
-                {
-                    mob.SendMessage("HandleInteract", hit.collider.gameObject);
-                }
+                Debug.Log("Hit " + hit.collider.tag);
+                gameObject.GetComponent<AIManager>().AddNewJob(hit.collider.gameObject);
             }
         }
     }
@@ -74,6 +73,16 @@ public class ControlManager : MonoBehaviour {
 
 
     }
+
+    float speed = 7f;
+
+    void handleKeys()
+    {
+        Camera.main.transform.Translate(new Vector2(Input.GetAxis("Horizontal") * speed * Time.deltaTime, Input.GetAxis("Vertical") * speed * Time.deltaTime));
+
+    }
+
+
 
     void drawSelectionBox()
     {
