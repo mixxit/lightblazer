@@ -9,11 +9,17 @@ public class ControlManager : MonoBehaviour {
     private Vector2 dragStartPos = Vector2.zero;
     private Vector2 dragEndPosition = Vector2.zero;
     public Texture tex;
-    
+    private Board board; 
+
 
     // Use this for initialization
     void Start() {
         Camera.main.orthographicSize = 10;
+        this.board = this.GetComponent<Board>();
+
+        Vector2 camposition = new Vector2(board.width/2,board.height/2);
+        Camera.main.transform.Translate(camposition);
+
     }
 
     // Update is called once per frame

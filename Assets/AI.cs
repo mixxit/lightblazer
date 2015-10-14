@@ -21,10 +21,16 @@ public class AI : MonoBehaviour {
     // Update is called once per frame
     void Update () {
 
+        
+	}
+
+
+    public void Think()
+    {
         Move();
         transform.position = cell.transform.position;
         HandleJob();
-	}
+    }
 
     public void HandleJob()
     {
